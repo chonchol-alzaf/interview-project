@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\OrderResource;
 use App\Models\Order;
 use Illuminate\Http\Request;
 
@@ -18,12 +19,14 @@ class OrderController extends Controller
         ]);
 
         $orders = Order::completed()
-        ->when($request->customer_id, function ($query) use ($request) {
-            $query->whereHas('customer', function ($query) use ($request) {
-                $query->where('id', $request->customer_id);
-            });
-        })
+        // ->when($request->customer_id, function ($query) use ($request) {
+        //     $query->whereHas('customer', function ($query) use ($request) {
+        //         $query->where('id', $request->customer_id);
+        //     });
+        // })
         ->get();
+
+        return OrderResource::collection($orders);
 
         return view('orders.index',compact('orders'));
     }
