@@ -2,16 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\OrderResource;
 use App\Models\Order;
 use Illuminate\Http\Request;
+use App\Http\Resources\OrderResource;
+use App\Http\Resources\OrderDetailsResource;
 
 class OrderController extends Controller
 {
 
     public function index(Request $request)
     {
-        
         $request->validate([
             "per_page" => "nullable|min:1|max:100",
             "page" => "nullable|min:1",
@@ -19,23 +19,17 @@ class OrderController extends Controller
         ]);
 
         $orders = Order::completed()
-        // ->when($request->customer_id, function ($query) use ($request) {
-        //     $query->whereHas('customer', function ($query) use ($request) {
-        //         $query->where('id', $request->customer_id);
-        //     });
-        // })
         ->get();
 
         return OrderResource::collection($orders);
-
-        return view('orders.index',compact('orders'));
     }
 
     public function show($order_id)
     {
-        $order = Order::where("id",$order_id)->first();
-        return view('orders.show',compact('order'));
+        $order = Order::where("id",$order_id)
+        ->with("customer:id,name,email,address,phone")
+        ->first();
+        
+        return OrderDetailsResource::make($order);
     }
-
-
 }
