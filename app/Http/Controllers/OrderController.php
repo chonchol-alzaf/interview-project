@@ -23,13 +23,4 @@ class OrderController extends Controller
 
         return OrderResource::collection($orders);
     }
-
-    public function show($order_id)
-    {
-        $order = Order::where("id",$order_id)
-        ->with("customer:id,name,email,address,phone")
-        ->first();
-        
-        return OrderDetailsResource::make($order);
-    }
 }
